@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useAudioAnalyser } from '~/composables/useAudioAnalyser'
 
 const { devices, activeDevice, isRunning, error, bands, getDevices, connect, disconnect } = useAudioAnalyser()
@@ -8,7 +8,7 @@ const selectedDeviceId = ref<string>('')
 
 onMounted(async () => {
   await getDevices()
-  // Auto-select USB Audio CODEC als die er is
+  // Auto-select USB Audio CODEC
   const codec = devices.value.find(d => d.label.toLowerCase().includes('usb audio codec'))
   if (codec) selectedDeviceId.value = codec.deviceId
 })
@@ -27,37 +27,13 @@ async function toggle() {
 </script>
 
 <template>
-  <main class="w-screen h-screen bg-[#0a0a0a] relative overflow-hidden flex items-center justify-center">
+  <main class="w-screen h-screen bg-[#0a0a0a] relative overflow-hidden">
 
-    <!-- Debug: band meters (tijdelijk, wordt straks vervangen door canvas) -->
-    <div class="flex flex-col gap-3 items-center">
-      <div class="flex gap-8 items-end h-32">
-        <div class="flex flex-col items-center gap-1">
-          <div
-            class="w-6 bg-white/80 rounded-sm transition-none"
-            :style="{ height: `${bands.low * 128}px` }"
-          />
-          <span class="text-white/30 text-[10px] tracking-widest">LOW</span>
-        </div>
-        <div class="flex flex-col items-center gap-1">
-          <div
-            class="w-6 bg-white/80 rounded-sm transition-none"
-            :style="{ height: `${bands.mid * 128}px` }"
-          />
-          <span class="text-white/30 text-[10px] tracking-widest">MID</span>
-        </div>
-        <div class="flex flex-col items-center gap-1">
-          <div
-            class="w-6 bg-white/80 rounded-sm transition-none"
-            :style="{ height: `${bands.high * 128}px` }"
-          />
-          <span class="text-white/30 text-[10px] tracking-widest">HIGH</span>
-        </div>
-      </div>
-    </div>
+    <!-- Canvas blob -->
+    <AudioBlob :bands="bands" :is-running="isRunning" />
 
-    <!-- Minimal UI overlay — bottom center -->
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3">
+    <!-- UI overlay — bottom center -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-10">
 
       <!-- Device select -->
       <select
@@ -78,10 +54,9 @@ async function toggle() {
 
       <!-- Status + start/stop -->
       <div class="flex items-center gap-3">
-        <!-- Status dot -->
         <span class="flex items-center gap-1.5">
           <span
-            class="w-1.5 h-1.5 rounded-full"
+            class="w-1.5 h-1.5 rounded-full transition-colors duration-500"
             :class="isRunning ? 'bg-green-400' : 'bg-white/20'"
           />
           <span class="text-white/30 text-[10px] tracking-widest uppercase">
@@ -89,7 +64,6 @@ async function toggle() {
           </span>
         </span>
 
-        <!-- Button -->
         <button
           @click="toggle"
           class="text-[10px] tracking-widest uppercase px-4 py-1.5 rounded border transition-colors cursor-pointer
@@ -99,7 +73,6 @@ async function toggle() {
         </button>
       </div>
 
-      <!-- Error -->
       <p v-if="error" class="text-red-400/70 text-[10px]">{{ error }}</p>
     </div>
 
