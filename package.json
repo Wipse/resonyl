@@ -1,0 +1,30 @@
+{
+  "name": "resonyl",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "oxc-parser",
+      "@oxc-parser/binding-darwin-arm64"
+    ]
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.2.2",
+    "nuxt": "^4.4.2",
+    "tailwindcss": "^4",
+    "vue": "^3.5.31",
+    "vue-router": "^5.0.4"
+  },
+  "optionalDependencies": {
+    "@oxc-parser/binding-darwin-arm64": "^0.117.0"
+  }
+}
